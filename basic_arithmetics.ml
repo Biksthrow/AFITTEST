@@ -39,4 +39,17 @@ let rec gcd a b =
     @param a non-zero integer
     @param b non-zero integer.
 *)
-let bezout a b = (0, 0, 0)
+let rec bezout a b =
+  let r = a in
+  let u = 1 in
+  let v = 0 in
+  let r_prime = b in
+  let u_prime = 0 in
+  let v_prime = 1 in
+  let rec calcul r u v r_prime u_prime v_prime =
+    if r_prime = 0 then 
+      (u,v,r)
+    else 
+      calcul r_prime u_prime v_prime (r-((r/r_prime)*r_prime)) (u-((r/r_prime)*u_prime)) (v-((r/r_prime)*v_prime))
+  in 
+   calcul r u v r_prime u_prime v_prime;;
