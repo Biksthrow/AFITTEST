@@ -159,3 +159,14 @@ let encrypt_g msg (g, p) kA = (0, 0)
     @param pub_data a tuple (g, p) of public data for ElGamal cryptosystem.
  *)
 let decrypt_g (msgA, msgB) a (g, p) = 0
+
+
+let () = let t_list = [((281237, (99400891, 36199003)), 70133953)]
+         in
+         run_test template_12_1 "Encrypt RSA Test" encrypt_rsa t_list
+;;
+
+let () = let t_list = [((70133953, (99400891, 30869683)), 281237)]
+         in
+         run_test template_12_1 "Decrypt RSA Test" decrypt_rsa t_list
+;;
