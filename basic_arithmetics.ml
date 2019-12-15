@@ -116,3 +116,24 @@ let prime_mod_power x n p =
         1
       else
         mod_power x (modulo n (p-1)) p
+        
+        
+        
+        
+        let modulo a b =
+  let rec sous_quot1 a b =
+      if (a>=0) && (a< (abs b)) then
+        a
+      else 
+        sous_quot1 (a-b) b 
+  in
+  let rec sous_quot2 a b =
+      if (a>=0) && (a<(abs b)) then
+        a
+      else 
+        sous_quot2 (a+b) b 
+    in
+      if (a >0 && b >0) || (a<0 && b <0) then 
+        sous_quot1 a b 
+      else
+         sous_quot2 a b ;;
