@@ -170,3 +170,12 @@ let () = let t_list = [((70133953, (99400891, 30869683)), 281237)]
          in
          run_test template_12_1 "Decrypt RSA Test" decrypt_rsa t_list
 ;;
+
+let is_prime n =
+  let rec second acu =
+    match acu with 
+     1 -> true
+    | acu when (n mod acu != 0) && (acu!=1) -> second (acu-1)
+    |_ -> false
+  in second (n-1);;
+
