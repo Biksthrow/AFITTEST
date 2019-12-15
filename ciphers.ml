@@ -58,42 +58,8 @@ let rec decrypt_cesar k m b =
     @param q prime number
 *)
      
-         (*utile pour generate_prime_with*)
-let rec gcd a b =
-  let rec pgcd a b n =
-     if modulo a n = 0 && modulo b n = 0 then
-      n
-    else
-      pgcd a b (n-1)
-  in
-  if ((a >0) && (b >0)) || ((a < 0) && (b<0)) then
-    if a >= b then 
-      pgcd a b b
-    else
-      pgcd b a a
-  else
-    if a >= 0 then
-      pgcd a b a
-    else
-      pgcd b a b
-      ;;
-      
-
-      let rec generate_prime_with phi_de_n= (*utile pour RSA_key*)
-        let ran = Random.int(phi_de_n-2)+2 in 
-        if gcd phi_de_n ran  = 1 then 
-          ran
-        else 
-          generate_prime_with phi_de_n  ;;
 
 
-    let inv_modulaire e modu = (*utile pour generate_keys_rsa*)
-      let rec search d = 
-      if e*d = modu +1 then 
-        d
-      else 
-        search (d+1)
-      in search 1;;
 
     let generate_keys_rsa p q =
       let n = p*q in
@@ -123,13 +89,40 @@ let power a b = (*utile pour encrypt_rsa*)
     pow (pow a 2) (b/2) 
   else 
     a*(pow (pow a 2) ((b-1)/2));;
+
+let mod_power x n m =
+  let rec pow c e =
+    if e <= n then
+      pow(modulo (c*x) m) (e+1)
+    else
+      c
+  in
+  pow 1 1;;
+
+        let modulo a b =
+  let rec sous_quot1 a b =
+      if (a>=0) && (a< (abs b)) then
+        a
+      else 
+        sous_quot1 (a-b) b 
+  in
+  let rec sous_quot2 a b =
+      if (a>=0) && (a<(abs b)) then
+        a
+      else 
+        sous_quot2 (a+b) b 
+    in
+      if (a >0 && b >0) || (a<0 && b <0) then 
+        sous_quot1 a b 
+      else
+         sous_quot2 a b ;;
     
-let encrypt_rsa m (n, e) = (power m e) - n ;;
+let encrypt_rsa m (n, e) = mod_power m e n ;;
 (** Decryption using RSA cryptosystem.
     @param m integer hash of encrypter message.
     @param pub_key a tuple (n, d) composing private key of RSA cryptosystem.
  *)
-let decrypt_rsa m (n , d) = 0
+let decrypt_rsa m (n , d) = mod_power m d n;;
   
 
 
@@ -139,43 +132,28 @@ let decrypt_rsa m (n , d) = 0
     where p is prime and g having high enough order modulo p.
     @param p is prime having form 2*q + 1 for prime q.
  *)
-let rec public_data_g p = (0, 0)
+let rec public_data_g p =
+  let g = Random.int (p+1) -1 in
+  (g,p)
 
 (** Generate ElGamal public data.
     @param pub_data a tuple (g, p) of public data for ElGamal cryptosystem.
  *)
-let generate_keys_g (g, p) = (0, 0)
+let generate_keys_g (g, p) =
+  let a= Random.int (p+1) -1 in (a, mod_power g a p);;
 
 (** ElGamal encryption process.
     @param msg message to be encrypted.
     @param pub_data a tuple (g, p) of ElGamal public data.
     @param kA ElGamal public key.
  *)
-let encrypt_g msg (g, p) kA = (0, 0)
+let encrypt_g msg (g, p) kA =
+  let k = Random.int(p+1) -1 in
+  (power g k,msg*power kA k);;
 
 (** ElGamal decryption process.
     @param msg a tuple (msgA, msgB) forming an encrypted ElGamal message.
     @param a private key
     @param pub_data a tuple (g, p) of public data for ElGamal cryptosystem.
  *)
-let decrypt_g (msgA, msgB) a (g, p) = 0
-
-
-let () = let t_list = [((281237, (99400891, 36199003)), 70133953)]
-         in
-         run_test template_12_1 "Encrypt RSA Test" encrypt_rsa t_list
-;;
-
-let () = let t_list = [((70133953, (99400891, 30869683)), 281237)]
-         in
-         run_test template_12_1 "Decrypt RSA Test" decrypt_rsa t_list
-;;
-
-let is_prime n =
-  let rec second acu =
-    match acu with 
-     1 -> true
-    | acu when (n mod acu != 0) && (acu!=1) -> second (acu-1)
-    |_ -> false
-  in second (n-1);;
-
+let decrypt_g (msgA, msgB) a (g, p) = power msgA (-a) *msgB;;
