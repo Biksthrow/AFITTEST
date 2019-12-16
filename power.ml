@@ -42,13 +42,17 @@ let power x n =
     @param m modular base
  *)
 let mod_power x n m =
-  let rec pow c e =
-    if e <= n then
-      pow(modulo (c*x) m) (e+1)
+  let rec pow x n m =
+    if n=0 then
+      1
     else
-      c
+      if modulo n 2 = 0 then
+        let z = pow x (n/2) m
+        in modulo (z*z) m
+      else modulo ((modulo x m)* pow x (n-1) m) m
+       
   in
-     pow 1 1;;
+     pow x n m;;
 
 (* Making use of Fermat Little Theorem for very quick exponentation
    modulo prime number.

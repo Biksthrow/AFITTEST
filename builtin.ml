@@ -65,10 +65,20 @@ let quot a b =
     @param a input integer
     @param b moduli a natural number.
 *)
-
+let modulo a b =
+  let rec sous_quot2 a b =
+      if (a>=0) && (a<(abs b)) then
+        a
+      else 
+        sous_quot2 (a+b) b
+  in
+  if (a >0 && b >0) || (a<0 && b <0) then
+    abs(a) mod abs(b)
+  else
+    sous_quot2 a b ;;
 
     
-let modulo a b =
+let modulo2 a b =
   let rec sous_quot1 a b =
       if (a>=0) && (a< (abs b)) then
         a

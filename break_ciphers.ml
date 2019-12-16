@@ -16,18 +16,13 @@ let isprime n =
 
 
 
-let break (key,autre) =
-  let rec destruc key arg =
-    if isprime arg then
-      if (modulo key arg) = 0 then
-        if isprime (quot key arg) && isprime arg then
-          ((quot key arg),arg)
-        else
-          destruc key (arg+1)
+let break key =
+  let(x,_) = key in
+  let rec destruc x arg =
+      if (x mod arg) = 0 then
+        (arg,x/arg)
       else
-        destruc key (arg+1)
-    else
-      destruc key (arg+1)
-  in destruc key 2;;
+        destruc x (arg+1)
+  in destruc x 2;;
   
   

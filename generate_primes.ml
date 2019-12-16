@@ -48,7 +48,12 @@ let eratosthenes n =
 (** Write a list into a file. Element seperator is newline.
     @param file path to write to.
  *)
-let write_list li file = ()
+let write_list li file =
+  let oc = open_out file in
+  let rec write = function
+     [] -> close_out oc
+    |e::l -> Printf.fprintf oc "%i/n" e
+  in write li;;
 
 (** Write a list of prime numbers up to limit into a txt file.
     @param n limit of prime numbers up to which to build up a list of primes.
