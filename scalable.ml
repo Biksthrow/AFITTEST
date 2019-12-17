@@ -17,21 +17,7 @@ decomposition of a non-negative integer.
 (** Creates a bitarray from a built-in integer.
     @param x built-in integer.
 *)
-let comple liste x =
-   let rec change liste relance  =
-     match (liste,relance) with
-      |([],_) -> []
-      |(e::l,false) when e = 0 -> 0 :: change l false
-      |(e::l,false) when e =1 -> 1 :: change l true
-      |(e::l,true) when e =1 -> 0 :: change l true
-      |(_::l,_) -> 1 :: change l true
-   in
-   match liste with
-     |[] -> []
-     |e::l -> if x >= 0 then
-                0 :: change l false
-             else
-                1 :: change l false;;
+
      
 
    let pow x n =
@@ -106,13 +92,30 @@ let list_to_dec list long =
   in resultat list long;;
 
 let to_int bA =
-  
+  let first_one liste =
+    let rec destruc liste puis=
+      match liste with
+          [] -> 0
+        |e::l-> e*power 2 puis  + destruc l (puis+1)
+    in
+    match liste with
+      |[] -> 0
+      |e::l when e =1 -> (-1)*destruc l 0
+      |_::l -> 1 * destruc l 0
+  in first_one bA;;
+
+
 
 (** Prints bitarray as binary number on standard output.
     @param bA a bitarray.
   *)
-let print_b bA = ()
-
+let print_b bA =
+  let rec printer liste =
+    match liste with
+      |[] -> print_string""
+      |e::l -> print_int e;
+        printer l
+  in printer bA;;
 (** Toplevel directive to use print_b as bitarray printer.
     CAREFUL: print_b is then list int printer.
     UNCOMMENT FOR TOPLEVEL USE.
@@ -129,22 +132,73 @@ let print_b bA = ()
     @param nA A natural, a bitarray having no sign bit.
            Assumed non-negative.
     @param nB A natural.
- *)
-let rec compare_n nA nB = 0
+*)
+let to_int_non_signe bA =
+    let rec destruc liste puis=
+      match liste with
+          [] -> 0
+        |e::l-> e*power 2 puis  + destruc l (puis+1)
+  in destruc bA 0 ;;
+
+
+
+let reverse bitarray =
+  let rec rev bitarray acu =
+      match bitarray with
+      [] -> acu
+     |e::l-> rev l (e::acu)
+  in rev bitarray [];;
+
+let rec length bitarray =
+  match bitarray with
+      [] -> 0
+     |e::l -> 1 + length l ;;
+        
+
+
+let compare_n nA nB =
+  let lena = length nA in
+  let lenb = length nB in
+  if lena > lenb then
+    1
+  else
+    if lenb > lena then
+      -1
+    else
+      let a = reverse nA in
+      let b = reverse nB in
+      let rec test a b =
+        match (a,b) with
+           ([],[]) -> 0
+          |(e::l,r::q) when e = r -> test l q
+          |(e::l,r::q) when e = 1 -> 1
+          |_ -> (-1)
+      in test a b;;
+
+
 
 (** Bigger inorder comparison operator on naturals. Returns true if
     first argument is bigger than second and false otherwise.
     @param nA natural.
     @param nB natural.
  *)
-let (>>!) nA nB = true
+
+let (>>!) nA nB =
+  if compare_n nA nB = 1 then
+    true
+  else
+    false;;
 
 (** Smaller inorder comparison operator on naturals. Returns true if
     first argument is smaller than second and false otherwise.
     @param nA natural.
     @param nB natural.
  *)
-let (<<!) nA nB = true
+let (<<!) nA nB =
+    if compare_n nA nB =-1 then
+    true
+  else
+    false;;
 
 (** Bigger or equal inorder comparison operator on naturals. Returns
     true if first argument is bigger or equal to second and false
@@ -152,7 +206,12 @@ let (<<!) nA nB = true
     @param nA natural.
     @param nB natural.
  *)
-let (>=!) nA nB = true
+let (>=!) nA nB =
+  let boolean = compare_n nA nB in
+  if boolean =1 || boolean =0 then
+    true
+  else
+    false;;
 
 (** Smaller or equal inorder comparison operator on naturals. Returns
     true if first argument is smaller or equal to second and false
@@ -160,28 +219,49 @@ let (>=!) nA nB = true
     @param nA natural.
     @param nB natural.
  *)
-let (<=!) nA nB = true
+let (<=!) nA nB =
+    let boolean = compare_n nA nB in
+  if boolean =(-1) || boolean =0 then
+    true
+  else
+    false;;
 
 (** Comparing two bitarrays. Output is 1 if first argument is bigger
     than second -1 if it smaller and 0 in case of equality.
     @param bA A bitarray.
     @param bB A bitarray.
 *)
-let compare_b bA bB = 0
+let compare_b bA bB =
+      match (bA,bB) with
+         (e::l,r::q) when e = r-> if e = 0 then
+                                      compare_n l q 
+                                  else
+                                      compare_n l q * (-1)
+        |(e::l,r::q) when e < r -> 1
+        |_ -> -1;;
+     
+  
 
 (** Bigger inorder comparison operator on bitarrays. Returns true if
     first argument is bigger than second and false otherwise.
     @param nA natural.
     @param nB natural.
  *)
-let (<<) bA bB = true
-
+let (<<) bA bB =
+    if compare_b bA bB = (-1) then
+    true
+  else
+    false;;
 (** Smaller inorder comparison operator on bitarrays. Returns true if
     first argument is smaller than second and false otherwise.
     @param nA natural.
     @param nB natural.
  *)
-let (>>) bA bB = true
+let (>>) bA bB =
+  if compare_b bA bB = 1 then
+    true
+  else
+    false;;
 
 (** Bigger or equal inorder comparison operator on bitarrays. Returns
     true if first argument is bigger or equal to second and false
@@ -189,31 +269,42 @@ let (>>) bA bB = true
     @param nA natural.
     @param nB natural.
  *)
-let (<<=) bA bB = true
+let (<<=) bA bB =
+    if compare_b bA bB = 1 then
+      false
+    else
+      true;;
 
-(** Smaller or equal inorder comparison operator on naturals. Returns
-    true if first argument is smaller or equal to second and false
-    otherwise.
-    @param nA natural.
-    @param nB natural.
- *)
-let (>>=) bA bB = true
-;;
+
+let (>>=) bA bB =
+  if compare_b bA bB = (-1) then
+    false
+  else
+    true;;
+
 
 (** Sign of a bitarray.
     @param bA Bitarray.
 *)
-let sign_b bA = 0
+let sign_b bA =
+  match bA with
+    |[] -> 1
+    | e::l when e =0 -> 1
+    |_ -> -1;;
+      
 
 (** Absolute value of bitarray.
     @param bA Bitarray.
 *)
-let abs_b bA = []
+let abs_b bA =
+  match bA with
+      e :: l -> 0 :: l;;
 
 (** Quotient of integers smaller than 4 by 2.
     @param a Built-in integer smaller than 4.
 *)
-let _quot_t a = 0
+let _quot_t a =
+  if 
 
 (** Modulo of integer smaller than 4 by 2.
     @param a Built-in integer smaller than 4.
