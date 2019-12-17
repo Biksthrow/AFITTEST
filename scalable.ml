@@ -314,26 +314,105 @@ let _mod_t a = 0
 (** Division of integer smaller than 4 by 2.
     @param a Built-in integer smaller than 4.
 *)
-let _div_t a = (0, 0)
+let _div_t a = 0
 
 (** Addition of two naturals.
     @param nA Natural.
     @param nB Natural.
 *)
-let add_n nA nB = []
+
+
+let add_n nA nB =
+  let rec ajout l1 l2 retenue =
+    match (l1,l2,retenue) with
+      |([],[],0) -> []
+      |([],[],retenue) -> 1 :: []
+      |(e::l,[],retenue) -> (match (e,retenue) with
+          |(0,0) -> 0:: ajout l [] 0
+          |(0,1) -> 1:: ajout l [] 0
+          |(1,0) -> 1:: ajout l [] 0
+          |(_,_) -> 0:: ajout l [] 1)
+      |([],r::q,retenue) -> (match (r,retenue) with
+          |(0,0) -> 0:: ajout [] q 0
+          |(0,1) -> 1:: ajout [] q 0
+          |(1,0) -> 1:: ajout [] q 0
+          |(_,_) -> 0:: ajout [] q 1)
+      |(e::l,r::q,retenue) -> (match (e,r,retenue) with
+          |(0,0,0) -> 0 :: ajout l q 0
+          |(0,0,1) -> 1 :: ajout l q 0
+          |(0,1,0) -> 1 :: ajout l q 0
+          |(0,1,1) -> 0 :: ajout l q 0
+          |(1,0,0) -> 1 :: ajout l q 0
+          |(1,0,1) -> 0 :: ajout l q 1
+          |(1,1,0) -> 0 :: ajout l q 1
+          |(_,_,_) -> 1 :: ajout l q 1)
+  in ajout nA nB 0;;
+ 
 
 (** Difference of two naturals.
     UNSAFE: First entry is assumed to be bigger than second.
     @param nA Natural.
     @param nB Natural.
 *)
-let diff_n nA nB = []
+
+
+
+
+
+let rec sur_n_bits bitarray n =
+  match (bitarray,n) with
+    |([],0) -> []
+    |([],n) -> 0:: sur_n_bits [] (n-1)
+    |(e::l,n) -> e::sur_n_bits l n;;
+
+     
+  
+
+let rec inversion_des_bits l1 =
+  match l1 with
+    |[] -> []
+    |1::l -> 0 :: inversion_des_bits l
+    |_::l -> 1 :: inversion_des_bits l;;
+
+let comple_a_deux nB =
+  let lenb = length(nB) -1 in
+  add_n (inversion_des_bits nB) (sur_n_bits [1] lenb);;
+
+let remove liste long =
+  let longueur = long-2 in
+  let rec rm bitarray n =
+    match (bitarray,n) with
+    |([],_) -> []
+    |(e::l,n) when n = longueur+1 -> rm l 0
+    |(e::l,n) when n = longueur -> (if e = 1 then
+        e :: rm l (n+1)
+      else
+        rm l (n+1))
+    |(e::l,n) -> e :: rm l (n+1)
+  in rm liste 0;;
+  
+        
+let diff_n nA nB =
+  let lena = length nA - length nB in
+  let long = length(add_n nA (comple_a_deux (sur_n_bits nB lena))) in
+  remove (add_n nA (comple_a_deux (sur_n_bits nB lena))) long ;;
+
 
 (** Addition of two bitarrays.
     @param bA Bitarray.
     @param bB Bitarray.
  *)
-let add_b bA bB = []
+let add_b bA bB =
+  let sign_A = sign_b(bA) in
+  let sign_B = sign_b(bB) in
+    match (bA,bB,sign_A,sign_B) with
+      |(e::l,r::q,-1,-1) -> 1:: add_n r q
+      |(e::l,r::q,1,1) -> 0:: add_n r q
+      |(e::l,r::q,-1,1) -> if compare_n r q = 1 then
+                              1 :: diff_n l q
+                           else
+                              0 :: diff_n q l 
+  
 
 (** Difference of two bitarrays.
     @param bA Bitarray.
