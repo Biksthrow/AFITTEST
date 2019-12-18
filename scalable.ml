@@ -492,7 +492,7 @@ let quot_b bA bB =
       resultat
     else
       div (diff_n bA bB) bB (add_n resultat [1])
-  in div bA bB [0];;
+  in div bA bB [0;0];;
 
 (** Modulo of a bitarray against a positive one.
     @param bA Bitarray the modulo of which you're computing.
@@ -503,8 +503,8 @@ let mod_b bA bB =
     if compare_n bA bB = (-1) then
       bA
     else
-      div (diff_n bA bB) bB (add_n resultat [1])
-  in div bA bB [0];;
+      div (diff_n bA bB) bB (add_n resultat [0;1])
+  in div bA bB [0;0];;
 
 (** Integer division of two bitarrays.
     @param bA Bitarray you want to divide.
@@ -516,4 +516,4 @@ let div_b bA bB =
       (bA,resultat)
     else
       div (diff_n bA bB) bB (add_n resultat [1])
-  in div bA bB [0];;
+  in div bA bB [0;0];;
