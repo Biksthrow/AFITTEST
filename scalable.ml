@@ -486,16 +486,34 @@ let mult_b bA bB =
     @param bA Bitarray you want to divide by second argument.
     @param bB Bitarray you divide by. Non-zero!
 *)
-let quot_b bA bB = []
+let quot_b bA bB =
+  let rec div bA bB resultat =
+    if compare_n bA bB = (-1) then
+      resultat
+    else
+      div (diff_n bA bB) bB (add_n resultat [1])
+  in div bA bB [0];;
 
 (** Modulo of a bitarray against a positive one.
     @param bA Bitarray the modulo of which you're computing.
     @param bB Bitarray which is modular base.
  *)
-let mod_b bA bB = []
+let mod_b bA bB =
+  let rec div bA bB resultat =
+    if compare_n bA bB = (-1) then
+      bA
+    else
+      div (diff_n bA bB) bB (add_n resultat [1])
+  in div bA bB [0];;
 
 (** Integer division of two bitarrays.
     @param bA Bitarray you want to divide.
     @param bB Bitarray you wnat to divide by.
 *)
-let div_b bA bB = ([], [])
+let div_b bA bB =
+  let rec div bA bB resultat =
+    if compare_n bA bB = (-1) then
+      (bA,resultat)
+    else
+      div (diff_n bA bB) bB (add_n resultat [1])
+  in div bA bB [0];;
