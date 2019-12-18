@@ -72,9 +72,6 @@ let from_int x =
   else
     1 :: en_bits (abs(x)) puiss;;
 
-  (*let y = abs x in
-  let max = puissance x in
-  if x < 0 then*)
     
     
    
@@ -195,7 +192,7 @@ let (>>!) nA nB =
     @param nB natural.
  *)
 let (<<!) nA nB =
-    if compare_n nA nB =-1 then
+    if compare_n nA nB =(-1) then
     true
   else
     false;;
@@ -298,13 +295,13 @@ let sign_b bA =
 *)
 let abs_b bA =
   match bA with
-      e :: l -> 0 :: l;;
+      [] ->[]
+    |e :: l -> 0 :: l;;
 
 (** Quotient of integers smaller than 4 by 2.
     @param a Built-in integer smaller than 4.
 *)
-let _quot_t a =
-  if 
+let _quot_t a = 0
 
 (** Modulo of integer smaller than 4 by 2.
     @param a Built-in integer smaller than 4.
@@ -341,7 +338,7 @@ let add_n nA nB =
           |(0,0,0) -> 0 :: ajout l q 0
           |(0,0,1) -> 1 :: ajout l q 0
           |(0,1,0) -> 1 :: ajout l q 0
-          |(0,1,1) -> 0 :: ajout l q 0
+          |(0,1,1) -> 0 :: ajout l q 1
           |(1,0,0) -> 1 :: ajout l q 0
           |(1,0,1) -> 0 :: ajout l q 1
           |(1,1,0) -> 0 :: ajout l q 1
@@ -405,32 +402,85 @@ let diff_n nA nB =
 let add_b bA bB =
   let sign_A = sign_b(bA) in
   let sign_B = sign_b(bB) in
-    match (bA,bB,sign_A,sign_B) with
-      |(e::l,r::q,-1,-1) -> 1:: add_n r q
-      |(e::l,r::q,1,1) -> 0:: add_n r q
-      |(e::l,r::q,-1,1) -> if compare_n r q = 1 then
+  match (bA,bB,sign_A,sign_B) with
+      |(bA,[],_,_) -> bA
+      |([],bB,_,_) -> bB
+      |(e::l,r::q,-1,-1) -> 1:: add_n l q
+      |(e::l,r::q,1,1) -> 0:: add_n l q
+      |(e::l,r::q,-1,1) -> if compare_n l q = 1 then
                               1 :: diff_n l q
                            else
-                              0 :: diff_n q l 
-  
+                              0 :: diff_n q l
+      |(_::l,_::q,_,_) -> if compare_n l q = 1 then
+                              0 :: diff_n l q
+                           else
+                              1 :: diff_n q l;;
+        
 
 (** Difference of two bitarrays.
     @param bA Bitarray.
     @param bB Bitarray.
 *)
-let diff_b bA bB = []
+
+
+let diff_b bA bB =
+  let sign_A = sign_b(bA) in
+  let sign_B = sign_b(bB) in
+  match (bA,bB,sign_A,sign_B) with
+      |(bA,[],_,_) -> bA
+      |([],r::q,_,-1) -> 0 :: q
+      |([],r::q,_,1) -> 1 ::q
+      |(e::l,r::q,-1,-1) -> if compare_n l q = 1 then
+                               1:: diff_n l q
+                             else
+                               0:: diff_n q l 
+      |(e::l,r::q,1,1) -> if compare_n l q = 1 then
+                               0:: diff_n l q
+                             else
+                               1:: diff_n q l 
+      |(e::l,r::q,-1,1) -> 1:: add_n l q
+      |(_::l,_::q,_,_) -> 0:: add_n l q
+      |(_,_,_,_) -> [] ;;
 
 (** Shifts bitarray to the left by a given natural number.
     @param bA Bitarray.
     @param d Non-negative integer.
 *)
-let rec shift bA d = []
+let shift bA d =
+  let rec insert bA d =
+    match (bA,d) with
+      |(bA,0) -> bA
+      |(bA,d) -> 0:: insert bA (d-1)
+  in
+  match bA with
+    |[]-> insert  [] d
+    |e::l -> e :: insert l d;;
 
 (** Multiplication of two bitarrays.
     @param bA Bitarray.
     @param bB Bitarray.
 *)
-let mult_b bA bB = []
+
+let rec shift_mult bA d =
+   match (bA,d) with
+      |(bA,0) -> bA
+      |(bA,d) -> 0:: shift_mult bA (d-1);;
+
+let mult_b bA bB =
+  let rec mult l q resultat acu=
+    match (l,q) with
+    |([],q) -> resultat
+    |(n::m,q) when n = 1 -> mult m q (add_n (shift_mult q acu) resultat) (acu+1)
+    |(_::m,q) -> mult m q resultat (acu+1)
+  in
+  match (bA,bB) with
+    |([],[]) -> [0]
+    |(e::l,[]) -> e::[0]
+    |([], r::q) -> r :: [0]
+    |(e::l,r::q) -> (match (e,r) with
+        |(0,0) -> 0:: mult l q [0] 0
+        |(1,1) -> 0:: mult l q [0] 0
+        |_ -> 1 :: mult l q [0] 0);;
 
 (** Quotient of two bitarrays.
     @param bA Bitarray you want to divide by second argument.
