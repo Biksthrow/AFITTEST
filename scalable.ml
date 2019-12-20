@@ -482,8 +482,16 @@ let mult_b bA bB =
         |(1,1) -> 0:: mult l q [0] 0
         |_ -> 1 :: mult l q [0] 0);;
 
-(** Quotient of two bitarrays.
-    @param bA Bitarray you want to divide by second argument.
+
+
+let mult_n bA bB =
+  let rec mult l q resultat acu=
+    match (l,q) with
+    |([],q) -> resultat
+    |(n::m,q) when n = 1 -> mult m q (add_n (shift_mult q acu) resultat) (acu+1)
+    |(_::m,q) -> mult m q resultat (acu+1)
+  in mult bA bB [0] 0;;
+(** Quotient of two bitarrays.    @param bA Bitarray you want to divide by second argument.
     @param bB Bitarray you divide by. Non-zero!
 *)
 let quot_b bA bB =
@@ -499,12 +507,39 @@ let quot_b bA bB =
     @param bB Bitarray which is modular base.
  *)
 let mod_b bA bB =
+  let signa = sign_b bA in
+  let signb = sign_b bB in
   let rec div bA bB resultat =
     if compare_n bA bB = (-1) then
       bA
     else
       div (diff_n bA bB) bB (add_n resultat [0;1])
-  in div bA bB [0;0];;
+  in
+  match (bA,bB) with
+    |(bA,[]) -> bA
+    |(e::l,r::q) -> (match (signa,signb) with
+        |(0,1) -> 1:: div l q [0;0]
+        |(1,0) -> 1:: div l q [0;0]
+        |_ -> 0:: div l q [0;0])
+    |_ -> [];;
+
+
+let mod_b_2 a b =
+  let bA = abs_b a in
+  let bB = abs_b b in 
+  let rec sous_quot2 a b =
+    if (>>=) a [0;0] && (<<) a (bB) then
+      a
+    else
+      sous_quot2 (add_b a b) b
+  in
+  if ((>>) a [0;0] && (>>) b [0;0]) || ((<<) a [0;0] && (<<) b [0;0]) then
+    mod_b (bA) (bB)
+  else
+    if (>>) bA bB then
+      sous_quot2 a b
+    else
+      sous_quot2 b a;;
 
 (** Integer division of two bitarrays.
     @param bA Bitarray you want to divide.

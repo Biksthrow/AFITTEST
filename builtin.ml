@@ -77,24 +77,7 @@ let modulo a b =
   else
     sous_quot2 a b ;;
 
-    
-let modulo2 a b =
-  let rec sous_quot1 a b =
-      if (a>=0) && (a< (abs b)) then
-        a
-      else 
-        sous_quot1 (a-b) b 
-  in
-  let rec sous_quot2 a b =
-      if (a>=0) && (a<(abs b)) then
-        a
-      else 
-        sous_quot2 (a+b) b 
-    in
-      if (a >0 && b >0) || (a<0 && b <0) then 
-        sous_quot1 a b 
-      else
-         sous_quot2 a b ;;
+
 
 (* Integer modulo implementations. Negative case need be taken into
    account ; representant is expected non-negative. This is not OCAML

@@ -109,7 +109,16 @@ let rec last_two l = match l with
     plus 1.
     @param limit positive integer bounding searched for primes.
     @param isprime function testing for (pseudo)primality.
- *)
+*)
+
+let is_prime n =
+  let rec second acu =
+    match acu with 
+     1 -> true
+    | acu when (n mod acu != 0) && (acu!=1) -> second (acu-1)
+    |_ -> false
+  in second (n-1);;
+
 let double_primes limit isprime =
   let primes = eratosthenes limit in
   let rec test primes =
@@ -128,7 +137,7 @@ let twin_primes limit isprime =
   let rec test primes =
     match primes with 
       | [] -> []
-      | e :: l when e =2 -> (2,3) :: test l
+      | e :: l when e =2 -> test l
       | e :: l when isprime (e+2) = true -> (e,(e+2)):: test l
       |_::l -> test l
   in test primes;;
