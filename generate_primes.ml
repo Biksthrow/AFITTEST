@@ -6,10 +6,6 @@ open Basic_arithmetics
 (* Initializing list of integers for eratosthenes's sieve. Naive
    version.
 *)
-
-(** List composed of 2 and then odd integers starting at 3.
-    @param n number of elements in the list of integers.
- *)
 let init_eratosthenes n =
   let rec generate e = 
     match e with 
@@ -141,3 +137,9 @@ let twin_primes limit isprime =
       | e :: l when isprime (e+2) = true -> (e,(e+2)):: test l
       |_::l -> test l
   in test primes;;
+(** List composed of 2 and then odd integers starting at 3.
+    @param n number of elements in the list of integers.
+ *)
+
+
+

@@ -1,4 +1,5 @@
 (** Tweaking OCaml built-in euclidean division
+
 The OCaml built-in euclidian divisions operations do not follow the
 standard mathematical conventions. We adapt OCaml available
 primitives to suit maths conventions.
@@ -8,17 +9,6 @@ primitives to suit maths conventions.
 (** Sign function
     @param x integer
 *)
-
-(* Integer quotient implementation ; main use is in case of quotient
-   of an integer by a natural number.
- *)
-
-(** Quotient of an integer by a natural number.
-    This is the quotient in euclidiant division sense.
-    @param a dividend
-    @param b natural number you divide by.
-*)
-
 let sign x =
   if x >= 0 then
     1
@@ -61,7 +51,6 @@ let quot a b =
     Following Euclidean division. NOT OCAML DEFAULT. Positive integer
     between 0 (included) and modulo (excluded) resulting from euclidian
     division of entry by modulo.
-
     @param a input integer
     @param b moduli a natural number.
 *)
@@ -111,3 +100,41 @@ let div a b =
          sous_quot2 x y 0;;
 
 
+
+
+(* Integer quotient implementation ; main use is in case of quotient
+   of an integer by a natural number.
+ *)
+
+(** Quotient of an integer by a natural number.
+    This is the quotient in euclidiant division sense.
+    @param a dividend
+    @param b natural number you divide by.
+ *)
+
+(* Integer modulo implementations. Negative case need be taken into
+   account ; representant is expected non-negative. This is not OCAML
+   default.
+ *)
+
+(** Modulo of two integers.
+    Following Euclidean division. NOT OCAML DEFAULT. Positive integer
+    between 0 (included) and modulo (excluded) resulting from euclidian
+    division of entry by modulo.
+
+    @param a input integer
+    @param b moduli a natural number.
+ *)
+
+
+(* Integer modulo implementations. Negative case need be taken into
+   account ; representant is expected non-negative. This is not OCAML
+   default.
+ *)
+
+(** Division of an integer by a natural number. NOT OCAML DEFAULT.
+    Division of an integer by a non-zero integer b is the unique couple
+    of integers (q, r) such that a = b*q + r and r is in [0, abs b[.
+    @param a dividend
+    @param b integer you divide by.
+*)

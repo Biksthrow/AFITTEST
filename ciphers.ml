@@ -13,6 +13,7 @@ open Power
     @param m word to cipher.
     @param b base ; for ASCII codes should be set to 255.
 *)
+
 let encrypt key int_letter nb_letter= 
   let rec modulo terminus =
     if terminus > nb_letter then
@@ -77,7 +78,6 @@ let rec decrypt_cesar k m b =
     
 let encrypt_rsa m (n, e) = mod_power m e n ;;
 (** Decryption using RSA cryptosystem.
-
     @param m integer hash of encrypter message.
     @param pub_key a tuple (n, d) composing private key of RSA cryptosystem.
  *)

@@ -6,8 +6,6 @@ open Scalable
     @param bA non-zero bitarray.
     @param bB non-zero bitarray.
 *)
-
-
 let rec search bitarray x =
   match bitarray with
     |[] -> 0
@@ -20,9 +18,9 @@ let gcd_b bA bB =
   let rec pgcd a b n =
      if search (mod_b a n) 1 = 0 && search (mod_b b n) 1 = 0 then
         match (x,y) with
-         |(1,1) -> 0 :: n
-         |(-1,-1) -> 0 :: n
-         |_ -> 1 :: n
+         |(1,1) -> diff_b (0 :: n) [0;1]
+         |(-1,-1) -> diff_b (0 :: n) [0;1]
+         |_ -> diff_b (1 :: n) [0;1]
     else
       pgcd a b (diff_n n [1])
   in
@@ -43,14 +41,15 @@ let gcd_b bA bB =
 let bezout_b bA bB =
   let r = bA in
   let u = [0;1] in
-  let v = [0;0] in
+  let v = [] in
   let r_prime = bB in
-  let u_prime = [0;0] in
+  let u_prime = [] in
   let v_prime = [0;1] in
   let rec calcul r u v r_prime u_prime v_prime =
-    if r_prime = [0;0] then 
-      (u,v,r)
-    else 
-      calcul r_prime u_prime v_prime (diff_b r (mult_b (quot_b r r_prime) r_prime)) (diff_b u (mult_b (quot_b r r_prime) u_prime)) (diff_b v (mult_b (quot_b r r_prime) v_prime))
-  in 
+    if r_prime = [] then
+      ((from_int(to_int u)),(from_int(to_int v)),(from_int(to_int r)))
+    else
+        calcul r_prime u_prime v_prime (diff_b r (mult_b (quot_b r r_prime) r_prime)) (diff_b u (mult_b (quot_b r r_prime) u_prime)) (diff_b v (mult_b (quot_b r r_prime) v_prime))
+        in 
    calcul r u v r_prime u_prime v_prime;;
+  

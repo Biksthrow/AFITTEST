@@ -1,4 +1,5 @@
 (** Basic arithmetics with built-in integers *)
+
 open Builtin
 
 (* Greater common divisor and smaller common multiple
@@ -9,8 +10,7 @@ open Builtin
     @param a non-zero integers
     @param b non-zero integer
 *)
-  
-let rec gcd a b =
+  let rec gcd a b =
   let x = sign a in
   let y = sign b in
   let rec pgcd a b n =
@@ -44,8 +44,19 @@ let rec bezout a b =
   let v_prime = 1 in
   let rec calcul r u v r_prime u_prime v_prime =
     if r_prime = 0 then 
-      (u,v,r)
-    else 
-      calcul r_prime u_prime v_prime (r-((r/r_prime)*r_prime)) (u-((r/r_prime)*u_prime)) (v-((r/r_prime)*v_prime))
+      print_int u
+    else
+      begin
+        print_int u;
+        print_int 5;
+        print_int v;
+        print_int 5;
+        print_int r;
+        print_int 5;
+        print_int r_prime;
+        print_int 9999;
+        calcul r_prime u_prime v_prime (r-((r/r_prime)*r_prime)) (u-((r/r_prime)*u_prime)) (v-((r/r_prime)*v_prime));
+     end
   in 
    calcul r u v r_prime u_prime v_prime;;
+

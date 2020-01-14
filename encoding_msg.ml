@@ -8,7 +8,7 @@ open Power
     @param str is a string representing message.
     @param bits number of bits on which to store a character ;
            alphanumeric ASCII is 7.
-*)
+ *)
 
 let pow x n =
   if x = 0 && n=0 then
@@ -98,4 +98,3 @@ let decode msg bits =
   in
   bits_to_traitement chaine_de_bits bits;;
   
-

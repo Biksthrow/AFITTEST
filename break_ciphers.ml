@@ -5,7 +5,7 @@ open Basic_arithmetics
 
 (** Factors product of two primes.
     @param key is public key of an RSA cryptosystem.
-*)
+ *)
 
 let isprime n =
   let rec second acu =
@@ -24,5 +24,4 @@ let break key =
       else
         destruc x (arg+1)
   in destruc x 2;;
-  
   

@@ -5,7 +5,6 @@ open Basic_arithmetics
 open Power
 
 
-(** Deterministic primality test *)
 let is_prime n =
   let rec second acu =
     match acu with 

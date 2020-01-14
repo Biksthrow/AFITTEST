@@ -12,15 +12,9 @@ down code. A natural bitarray is understood as being a bitarray of
 which you've taken out the sign bit, it is just the binary
 decomposition of a non-negative integer.
 
- *)
-
-(** Creates a bitarray from a built-in integer.
-    @param x built-in integer.
 *)
 
-     
-
-   let pow x n =
+  let pow x n =
   if x = 0 && n=0 then
     1
   else
@@ -66,11 +60,14 @@ let en_bits integer bits =
   in conversion (bits-1) integer [];;
 
 let from_int x =
-  let puiss = found (abs(x)) 0 in
-  if x > 0 then
-    0:: en_bits x puiss
+  if x = 0 then
+    []
   else
-    1 :: en_bits (abs(x)) puiss;;
+    let puiss = found (abs(x)) 0 in
+    if x >= 0 then
+      0:: en_bits x puiss
+    else
+      1 :: en_bits (abs(x)) puiss;;
 
     
     
@@ -229,13 +226,18 @@ let (<=!) nA nB =
     @param bB A bitarray.
 *)
 let compare_b bA bB =
-      match (bA,bB) with
-         (e::l,r::q) when e = r-> if e = 0 then
-                                      compare_n l q 
-                                  else
-                                      compare_n l q * (-1)
-        |(e::l,r::q) when e < r -> 1
-        |_ -> -1;;
+  match (bA,bB) with
+     ([],[]) -> 0
+    |(e::l,[])  when e =1 -> -1
+    |(e::l,[])  when e =0-> 1
+    |([],r::q)  when r=0 -> -1
+    |([],r::q)  when r=1-> 1
+    |(e::l,r::q) when e = r-> if e = 0 then
+                                 compare_n l q 
+                              else
+                                 compare_n l q * (-1)
+    |(e::l,r::q) when e < r -> 1
+    |_ -> -1;;
      
   
 
@@ -375,24 +377,32 @@ let comple_a_deux nB =
   let lenb = length(nB) -1 in
   add_n (inversion_des_bits nB) (sur_n_bits [1] lenb);;
 
-let remove liste long =
-  let longueur = long-2 in
-  let rec rm bitarray n =
-    match (bitarray,n) with
-    |([],_) -> []
-    |(e::l,n) when n = longueur+1 -> rm l 0
-    |(e::l,n) when n = longueur -> (if e = 1 then
-        e :: rm l (n+1)
-      else
-        rm l (n+1))
-    |(e::l,n) -> e :: rm l (n+1)
-  in rm liste 0;;
+let remove liste long = 
+    let longueur = long-2 in
+    let rec rm bitarray n =
+      match (bitarray,n) with
+        |([],_) -> []
+        |(e::l,n) when n = longueur+1 -> rm l 0
+        |(e::l,n) when n = longueur -> (if e = 1 then
+            e :: rm l (n+1)
+          else
+            rm l (n+1))
+        |(e::l,n) -> e :: rm l (n+1)
+    in
+    let l2 = rm liste 0 in
+    match (l2) with
+      |[0] ->[]
+      |[] -> []
+      |e::r::q when (e =0 && r =0) && q = [] -> []
+      |_ -> l2;;
   
         
 let diff_n nA nB =
   let lena = length nA - length nB in
   let long = length(add_n nA (comple_a_deux (sur_n_bits nB lena))) in
   remove (add_n nA (comple_a_deux (sur_n_bits nB lena))) long ;;
+          
+
 
 
 (** Addition of two bitarrays.
@@ -410,12 +420,17 @@ let add_b bA bB =
       |(e::l,r::q,-1,1) -> if compare_n l q = 1 then
                               1 :: diff_n l q
                            else
-                              0 :: diff_n q l
+                              if compare_n l q = -1 then
+                                 0 :: diff_n q l
+                              else
+                                 []
       |(_::l,_::q,_,_) -> if compare_n l q = 1 then
-                              0 :: diff_n l q
-                           else
-                              1 :: diff_n q l;;
-        
+                             0 :: diff_n l q
+                          else
+                              if compare_n l q = -1 then
+                                1 :: diff_n q l
+                              else
+                                    [];;
 
 (** Difference of two bitarrays.
     @param bA Bitarray.
@@ -432,12 +447,18 @@ let diff_b bA bB =
       |([],r::q,_,1) -> 1 ::q
       |(e::l,r::q,-1,-1) -> if compare_n l q = 1 then
                                1:: diff_n l q
-                             else
-                               0:: diff_n q l 
-      |(e::l,r::q,1,1) -> if compare_n l q = 1 then
-                               0:: diff_n l q
-                             else
-                               1:: diff_n q l 
+                            else
+                               if compare_n l q = -1 then
+                                 0:: diff_n q l
+                               else
+                                 []
+      |(e::l,r::q,1,1) -> if compare_n l q = (-1) then
+                                1:: diff_n q l 
+                          else
+                                if compare_n l q =1 then
+                                   0:: diff_n l q
+                                else
+                                   []
       |(e::l,r::q,-1,1) -> 1:: add_n l q
       |(_::l,_::q,_,_) -> 0:: add_n l q
       |(_,_,_,_) -> [] ;;
@@ -474,9 +495,9 @@ let mult_b bA bB =
     |(_::m,q) -> mult m q resultat (acu+1)
   in
   match (bA,bB) with
-    |([],[]) -> [0]
-    |(e::l,[]) -> e::[0]
-    |([], r::q) -> r :: [0]
+    |([],[]) -> []
+    |(_,[]) -> []
+    |([],_) -> []
     |(e::l,r::q) -> (match (e,r) with
         |(0,0) -> 0:: mult l q [0] 0
         |(1,1) -> 0:: mult l q [0] 0
@@ -499,8 +520,8 @@ let quot_b bA bB =
     if compare_n bA bB = (-1) then
       resultat
     else
-      div (diff_n bA bB) bB (add_n resultat [1])
-  in div bA bB [0;0];;
+      div (diff_b bA bB) bB (add_n resultat [0;1])
+  in div bA bB [];;
 
 (** Modulo of a bitarray against a positive one.
     @param bA Bitarray the modulo of which you're computing.
@@ -509,37 +530,30 @@ let quot_b bA bB =
 let mod_b bA bB =
   let signa = sign_b bA in
   let signb = sign_b bB in
-  let rec div bA bB resultat =
-    if compare_n bA bB = (-1) then
-      bA
+  let rec div lA lB  =
+    if compare_n lA lB = (-1) then
+       lA 
     else
-      div (diff_n bA bB) bB (add_n resultat [0;1])
+      div (diff_n lA lB) lB 
+  in
+  let rec div2 lA lB  =
+    if (>>=) lA [] && (<<) lA lB  then
+       lA 
+    else
+      div2 (add_b lA lB) lB 
   in
   match (bA,bB) with
+    ([], _::_) -> []
     |(bA,[]) -> bA
-    |(e::l,r::q) -> (match (signa,signb) with
-        |(0,1) -> 1:: div l q [0;0]
-        |(1,0) -> 1:: div l q [0;0]
-        |_ -> 0:: div l q [0;0])
-    |_ -> [];;
+    |(e::l,r::q)-> (match (signa,signb)with
+            |(-1,1) -> div2 bA bB
+            |_-> (match (div l q) with
+                |[] ->[]
+                |e -> 0:: e));;
+  
 
 
-let mod_b_2 a b =
-  let bA = abs_b a in
-  let bB = abs_b b in 
-  let rec sous_quot2 a b =
-    if (>>=) a [0;0] && (<<) a (bB) then
-      a
-    else
-      sous_quot2 (add_b a b) b
-  in
-  if ((>>) a [0;0] && (>>) b [0;0]) || ((<<) a [0;0] && (<<) b [0;0]) then
-    mod_b (bA) (bB)
-  else
-    if (>>) bA bB then
-      sous_quot2 a b
-    else
-      sous_quot2 b a;;
+
 
 (** Integer division of two bitarrays.
     @param bA Bitarray you want to divide.
@@ -552,3 +566,7 @@ let div_b bA bB =
     else
       div (diff_n bA bB) bB (add_n resultat [1])
   in div bA bB [0;0];;
+
+(** Creates a bitarray from a built-in integer.
+    @param x built-in integer.
+*)

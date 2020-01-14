@@ -1,4 +1,3 @@
-
 (** Power function implementations for built-in integers *)
 
 open Builtin
@@ -10,7 +9,8 @@ open Basic_arithmetics
 (** Naive power function. Linear complexity
     @param x base
     @param n exponent
- *)
+*)
+
 let pow x n =
   if x = 0 && n=0 then
     1
@@ -74,5 +74,11 @@ let prime_mod_power x n p =
       if n = p-1 then
         1
       else
-        mod_power x (modulo n (p-1)) p
+        mod_power x (modulo n (p-1)) p;;
+
+
+(** Fast integer exponentiation function. Logarithmic complexity.
+    @param x base
+    @param n exponent
+ *)
 
