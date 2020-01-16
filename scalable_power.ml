@@ -60,6 +60,8 @@ let power x n =
     @param m modular base, a positive bitarray
 *)
 
+
+
 let mod_po x n m =
     let rec mod_pow x n m =
       if compare_b n [] = 0 then
@@ -78,7 +80,6 @@ let mod_power x n m =
     |(x,n) when x = [1;1] && mod_b n [0;0;1] = []-> mod_b [0;1] m
     |(x,n) when x = [1;1] && mod_b n [0;0;1] = [0;1] -> mod_b [1;1] m
     |_ ->mod_po x n m;;
-
 
 
 (* Making use of Fermat Little Theorem for very quick exponentation

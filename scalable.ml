@@ -523,6 +523,27 @@ let quot_b bA bB =
       div (diff_b bA bB) bB (add_n resultat [0;1])
   in div bA bB [];;
 
+
+
+let getPowerTwo a b =
+  let rec compte a b count acu =
+    if compare_b b a != 1 then
+      compte a (shift_mult b 1) (count+1) ((b, shift_mult [0;1] count)::acu)
+    else
+      (b,[0;1]) :: acu
+  in compte a (shift_mult b 1) 0 [] ;;
+
+
+
+
+
+let rec getMyList coupleList =
+  match coupleList with
+    |[] -> []
+    |_::[] -> []
+    |e::r::l when compare_b e r = 1  -> 1:: getMyList ((diff_b e r)::l)
+    |e::_::l -> 0:: getMyList (e::l);;
+
 (** Modulo of a bitarray against a positive one.
     @param bA Bitarray the modulo of which you're computing.
     @param bB Bitarray which is modular base.
