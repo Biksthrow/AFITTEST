@@ -378,105 +378,46 @@ let rec sur_n_bits bitarray n =
      
   
 
-let rec inversion_des_bits l1 =
-  match l1 with
-    |[] -> []
-    |1::l -> 0 :: inversion_des_bits l
-    |_::l -> 1 :: inversion_des_bits l;;
-
-let comple_a_deux nB =
-  let lenb = length(nB) -1 in
-  add_n (inversion_des_bits nB) (sur_n_bits [1] lenb);;
-
-let remove liste long = 
-    let longueur = long-2 in
-    let rec rm bitarray n =
-      match (bitarray,n) with
-        |([],_) -> []
-        |(e::l,n) when n = longueur+1 -> rm l 0
-        |(e::l,n) when n = longueur -> (if e = 1 then
-            e :: rm l (n+1)
-          else
-            rm l (n+1))
-        |(e::l,n) -> e :: rm l (n+1)
-    in
-    let l2 = rm liste 0 in
-    match (l2) with
-      |[0] ->[]
-      |[] -> []
-      |e::r::q when (e =0 && r =0) && q = [] -> []
-      |_ -> l2;;
-  
-        
-let diff_n nA nB =
-  let lena = length nA - length nB in
-  let long = length(add_n nA (comple_a_deux (sur_n_bits nB lena))) in
-  remove (add_n nA (comple_a_deux (sur_n_bits nB lena))) long ;;
 
 
-(*let rec test_diff_n x y retenue = (*a >b*)
-  match(x,y,retenue) with
-    |([],[],1) -> [1] (*pas censer arriver*)
-    |([],[],_)-> [] (*pas censer arriver*)
+let rec test_diff_n x y retenue = (*a >b*)
+  match (x,y,retenue) with
+    |([],[],true) -> [1] (*pas censer arriver*)
+    |([],[],false)-> [] (*pas censer arriver*)
     |([],_,_) -> [](*n'est pas cense arriver*)
-    |(e::l,[],0) ->(match e with
-        |0 -> 0::test_diff_n l y 0
-        |_ -> 1::test_diff_n l y 0)
-    |(e::l,[],_)-> (match e with
-        |0 -> 1:: test_diff_n l y 1
-        |_ -> 0:: test_diff_n l y 0)
+    |(e::l,[],false) ->(match e with
+        |0 -> 0::test_diff_n l y false
+        |_ -> 1::test_diff_n l y false)
+    |(e::l,[],true)-> (match e with
+        |0 -> 1:: test_diff_n l y true
+        |_ -> 0:: test_diff_n l y false)
     |(e::l,r::q,retenue) -> (match (e,r,retenue) with
-        |(0,0,0) -> 0 :: test_diff_n_positif l q 0
-        |(0,0,1) -> 1 :: test_diff_n_positif l q 1
-        |(0,1,0) -> 1 :: test_diff_n_positif l q 1
-        |(0,1,1) -> 0 :: test_diff_n_positif l q 1
-        |(1,0,0) -> 1 :: test_diff_n_positif l q 0
-        |(1,0,1) -> 0 :: test_diff_n_positif l q 0
-        |(1,1,0) -> 0 :: test_diff_n_positif l q 0
-        |_ -> 1 :: test_diff_n_positif l q 1);; (*forcement (1,1,1)*) (*ne gere pas les cas b>a*)*)
+        |(0,0,false) -> 0 :: test_diff_n l q false
+        |(0,0,true) -> 1 :: test_diff_n l q true
+        |(0,1,false) -> 1 :: test_diff_n l q true
+        |(0,1,true) -> 0 :: test_diff_n l q true
+        |(1,0,false) -> 1 :: test_diff_n l q false
+        |(1,0,true) -> 0 :: test_diff_n l q false
+        |(1,1,false) -> 0 :: test_diff_n l q false
+        |_ -> 1 :: test_diff_n l q true);; (*forcement (1,1,1)*) (*ne gere pas les cas b>a*)
 
-
+let rec enleve_0 list =
+  match list with
+    |[] ->[]
+    |e::l when e =0 -> enleve_0 l
+    |a -> a;;
   
-(*let rec diff_n nA nB =
+let rec diff_n nA nB =
   let b = compare_n nA nB in
   match b with
     |0-> []
-  |_-> (test_diff_n_positif nA nB 0);;*)
+    |_-> reverse (enleve_0 (reverse (test_diff_n nA nB false))) ;;
+
+
 
 
    
-(*let diff_n nA nB =
-  let rec loop l1 l2 retenue=
-    match (l1,l2) with
-      |([],[]) when retenue->[1]
-      |([],[])->[]
-      |([],_)->[]
-      |(e1::l1,[])->
-        (match e1 with
-	  |0 when retenue -> 1::loop l1 l2 true
-          |0 ->  0::loop l1 l2 false
-          |1 when retenue -> 0:: loop l1 l2 false
-          |_ -> 1::loop l1 l2 false)
-      |(e1::l1, e2::l2)->
-	(match (e1,e2) with
-	  |(0,0) when retenue -> 1::loop l1 l2 true
-	  |(0,0)-> 0::loop l1 l2 false
-	  |(1,1) when retenue -> 1::loop l1 l2 true
-	  |(1,1)-> 0::loop l1 l2 false
-	  |(1,0) when retenue -> 0::loop l1 l2 false
-          |(1,0) -> 1::loop l1 l2 false
-          |(0,1) when retenue -> 0::loop l1 l2 true
-          |(_,_) -> 1::loop l1 l2 true)
-  in
-  let simplifier l=
-    let rec loop l=
-      match l with
-          []->[]
-        |e1::l1 -> if e1=0 then loop l1 else l
-    in
-    reverse_n (loop(reverse_n l))
-  in
-  simplifier(loop nA nB false);;*)
+
 
 
 (** Addition of two bitarrays.
@@ -616,17 +557,13 @@ let getMyList retenue coupleList =
       match couplList with
         |[] -> final
         |(e,r)::l when (((>>=) retenue e ) && (retenue!=[])) ->
-         ( begin
-            print_int (to_int retenue);
-            print_string(" ");
-            print_int (to_int e);
-            print_string(" r:");
-            print_int (to_int final);
-            print_newline();
             getOthers (diff_b retenue e) l (add_b r final);
-          end)
         |_::l ->getOthers  retenue l final
   in getOthers retenue coupleList [] ;;
+
+let div_b a b =
+  let v = getPowerTwo a b in
+  getMyList a v;;
 
 
 

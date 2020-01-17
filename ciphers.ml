@@ -90,7 +90,10 @@ let decrypt_rsa m (n , d) = mod_power m d n;;
 (** Generate ElGamal public data. Generates a couple (g, p)
     where p is prime and g having high enough order modulo p.
     @param p is prime having form 2*q + 1 for prime q.
- *)
+*)
+
+
+  
 let rec public_data_g p =
   let g = Random.int p in
   (g,p)

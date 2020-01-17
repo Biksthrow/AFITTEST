@@ -7,15 +7,6 @@ open Basic_arithmetics
     @param key is public key of an RSA cryptosystem.
  *)
 
-let isprime n =
-  let rec second acu =
-    match acu with
-        acu when ( n mod acu !=0) && (acu !=1) -> second (acu-1)
-      |_ -> false
-  in second (n-1);;
-
-
-
 let break key =
   let(x,_) = key in
   let rec destruc x arg =

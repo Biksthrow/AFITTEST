@@ -44,19 +44,9 @@ let rec bezout a b =
   let v_prime = 1 in
   let rec calcul r u v r_prime u_prime v_prime =
     if r_prime = 0 then 
-      print_int u
+      (u,v,r)
     else
-      begin
-        print_int u;
-        print_int 5;
-        print_int v;
-        print_int 5;
-        print_int r;
-        print_int 5;
-        print_int r_prime;
-        print_int 9999;
         calcul r_prime u_prime v_prime (r-((r/r_prime)*r_prime)) (u-((r/r_prime)*u_prime)) (v-((r/r_prime)*v_prime));
-     end
   in 
    calcul r u v r_prime u_prime v_prime;;
 
