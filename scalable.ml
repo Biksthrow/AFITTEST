@@ -14,6 +14,16 @@ decomposition of a non-negative integer.
 
 *)
 
+
+(*let reverse_n bA=
+  let rec loop l1 l2=
+    match l1 with
+      []->l2
+      | e::l1-> loop l1 (e::l2)
+  in
+  loop bA [];;*)
+
+
   let pow x n =
   if x = 0 && n=0 then
     1
@@ -35,6 +45,7 @@ let power x n =
   else
     x*(pow(pow x 2) ((n-1)/2));;
 let abs x =
+  
   if x > 0 then
     x
   else
@@ -401,8 +412,71 @@ let diff_n nA nB =
   let lena = length nA - length nB in
   let long = length(add_n nA (comple_a_deux (sur_n_bits nB lena))) in
   remove (add_n nA (comple_a_deux (sur_n_bits nB lena))) long ;;
-          
 
+
+(*let rec test_diff_n x y retenue = (*a >b*)
+  match(x,y,retenue) with
+    |([],[],1) -> [1] (*pas censer arriver*)
+    |([],[],_)-> [] (*pas censer arriver*)
+    |([],_,_) -> [](*n'est pas cense arriver*)
+    |(e::l,[],0) ->(match e with
+        |0 -> 0::test_diff_n l y 0
+        |_ -> 1::test_diff_n l y 0)
+    |(e::l,[],_)-> (match e with
+        |0 -> 1:: test_diff_n l y 1
+        |_ -> 0:: test_diff_n l y 0)
+    |(e::l,r::q,retenue) -> (match (e,r,retenue) with
+        |(0,0,0) -> 0 :: test_diff_n_positif l q 0
+        |(0,0,1) -> 1 :: test_diff_n_positif l q 1
+        |(0,1,0) -> 1 :: test_diff_n_positif l q 1
+        |(0,1,1) -> 0 :: test_diff_n_positif l q 1
+        |(1,0,0) -> 1 :: test_diff_n_positif l q 0
+        |(1,0,1) -> 0 :: test_diff_n_positif l q 0
+        |(1,1,0) -> 0 :: test_diff_n_positif l q 0
+        |_ -> 1 :: test_diff_n_positif l q 1);; (*forcement (1,1,1)*) (*ne gere pas les cas b>a*)*)
+
+
+  
+(*let rec diff_n nA nB =
+  let b = compare_n nA nB in
+  match b with
+    |0-> []
+  |_-> (test_diff_n_positif nA nB 0);;*)
+
+
+   
+(*let diff_n nA nB =
+  let rec loop l1 l2 retenue=
+    match (l1,l2) with
+      |([],[]) when retenue->[1]
+      |([],[])->[]
+      |([],_)->[]
+      |(e1::l1,[])->
+        (match e1 with
+	  |0 when retenue -> 1::loop l1 l2 true
+          |0 ->  0::loop l1 l2 false
+          |1 when retenue -> 0:: loop l1 l2 false
+          |_ -> 1::loop l1 l2 false)
+      |(e1::l1, e2::l2)->
+	(match (e1,e2) with
+	  |(0,0) when retenue -> 1::loop l1 l2 true
+	  |(0,0)-> 0::loop l1 l2 false
+	  |(1,1) when retenue -> 1::loop l1 l2 true
+	  |(1,1)-> 0::loop l1 l2 false
+	  |(1,0) when retenue -> 0::loop l1 l2 false
+          |(1,0) -> 1::loop l1 l2 false
+          |(0,1) when retenue -> 0::loop l1 l2 true
+          |(_,_) -> 1::loop l1 l2 true)
+  in
+  let simplifier l=
+    let rec loop l=
+      match l with
+          []->[]
+        |e1::l1 -> if e1=0 then loop l1 else l
+    in
+    reverse_n (loop(reverse_n l))
+  in
+  simplifier(loop nA nB false);;*)
 
 
 (** Addition of two bitarrays.
@@ -449,14 +523,14 @@ let diff_b bA bB =
                                1:: diff_n l q
                             else
                                if compare_n l q = -1 then
-                                 0:: diff_n q l
+                                 0:: diff_n q l 
                                else
                                  []
       |(e::l,r::q,1,1) -> if compare_n l q = (-1) then
                                 1:: diff_n q l 
                           else
                                 if compare_n l q =1 then
-                                   0:: diff_n l q
+                                   0:: diff_n l q 
                                 else
                                    []
       |(e::l,r::q,-1,1) -> 1:: add_n l q
@@ -527,22 +601,35 @@ let quot_b bA bB =
 
 let getPowerTwo a b =
   let rec compte a b count acu =
-    if compare_b b a != 1 then
+    if compare_b a b != -1 then
       compte a (shift_mult b 1) (count+1) ((b, shift_mult [0;1] count)::acu)
     else
-      (b,[0;1]) :: acu
-  in compte a (shift_mult b 1) 0 [] ;;
+      acu
+  in compte a b 0 [] ;;
 
 
 
 
 
-let rec getMyList coupleList =
-  match coupleList with
-    |[] -> []
-    |_::[] -> []
-    |e::r::l when compare_b e r = 1  -> 1:: getMyList ((diff_b e r)::l)
-    |e::_::l -> 0:: getMyList (e::l);;
+let getMyList retenue coupleList =
+  let rec getOthers retenue couplList final =
+      match couplList with
+        |[] -> final
+        |(e,r)::l when (((>>=) retenue e ) && (retenue!=[])) ->
+         ( begin
+            print_int (to_int retenue);
+            print_string(" ");
+            print_int (to_int e);
+            print_string(" r:");
+            print_int (to_int final);
+            print_newline();
+            getOthers (diff_b retenue e) l (add_b r final);
+          end)
+        |_::l ->getOthers  retenue l final
+  in getOthers retenue coupleList [] ;;
+
+
+
 
 (** Modulo of a bitarray against a positive one.
     @param bA Bitarray the modulo of which you're computing.
@@ -555,7 +642,7 @@ let mod_b bA bB =
     if compare_n lA lB = (-1) then
        lA 
     else
-      div (diff_n lA lB) lB 
+      div (diff_n lA lB ) lB 
   in
   let rec div2 lA lB  =
     if (>>=) lA [] && (<<) lA lB  then
@@ -585,7 +672,7 @@ let div_b bA bB =
     if compare_n bA bB = (-1) then
       (bA,resultat)
     else
-      div (diff_n bA bB) bB (add_n resultat [1])
+      div (diff_n bA bB ) bB (add_n resultat [1])
   in div bA bB [0;0];;
 
 (** Creates a bitarray from a built-in integer.
