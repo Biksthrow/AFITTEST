@@ -1,2 +1,1 @@
-# AFITTEST
-Projet de cryptographie 
+# Crypto Project 
